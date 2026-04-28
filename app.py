@@ -94,7 +94,7 @@ st.markdown("""
     .result-label { font-size: 1rem; color: #888; }
 
     /* Hide Streamlit branding */
-    #MainMenu, footer, header { visibility: hidden; }
+    #MainMenu, footer{ visibility: hidden; }
     .stDeployButton { display: none; }
 </style>
 """, unsafe_allow_html=True)
