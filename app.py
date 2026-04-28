@@ -15,8 +15,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
-st.sidebar.title("DEBUG SIDEBAR")
-st.sidebar.write("If you see this → sidebar is working")
 st.sidebar.header("Navigation")
 
 # ── Custom CSS ────────────────────────────────────────────────────────────────
