@@ -146,7 +146,6 @@ plt.rcParams.update({'font.family': 'DejaVu Sans', 'axes.spines.top': False, 'ax
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.write(" ")
-    st.button("Test Sidebar")
     st.markdown("## 📊 HR Attrition\n**People Analytics Dashboard**")
     st.markdown("---")
     page = st.radio("Navigate", [
