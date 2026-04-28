@@ -442,8 +442,13 @@ elif page == "🚨  At-Risk Watch List":
     if model is None or df_clean is None:
         st.warning("⚠️ Model or cleaned data not found. Run notebooks 01 and 03 first.")
         st.stop()
+    # Convert input to DataFrame
+     X = pd.DataFrame([input_data])
 
-    X = df_clean.drop('Attrition', axis=1)
+     # Match training features
+     X = X.reindex(columns=feature_names, fill_value=0)
+
+    # Predict probability
     probs = model.predict_proba(X)[:, 1]
 
     watch = df_raw[['Age', 'Department', 'JobRole', 'MonthlyIncome',
