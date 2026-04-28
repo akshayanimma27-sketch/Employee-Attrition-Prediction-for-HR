@@ -450,7 +450,8 @@ elif page == "🚨  At-Risk Watch List":
         st.warning("⚠️ Model or cleaned data not found. Run notebooks 01 and 03 first.")
         st.stop()
 
-    X = df_clean.drop('Attrition', axis=1)
+    X = df_clean.copy()
+    X=X[feature_names]
     probs = model.predict_proba(X)[:, 1]
 
     watch = df_raw[['Age', 'Department', 'JobRole', 'MonthlyIncome',
