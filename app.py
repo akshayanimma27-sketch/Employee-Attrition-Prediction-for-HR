@@ -91,7 +91,7 @@ st.markdown("""
     .result-label { font-size: 1rem; color: #888; }
 
     /* Hide Streamlit branding */
-    #MainMenu, footer, header { visibility: hidden; }
+    #MainMenu, footer{ visibility: hidden; }
     .stDeployButton { display: none; }
 </style>
 """, unsafe_allow_html=True)
@@ -145,6 +145,7 @@ plt.rcParams.update({'font.family': 'DejaVu Sans', 'axes.spines.top': False, 'ax
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
+    st.write(" ")
     st.markdown("## 📊 HR Attrition\n**People Analytics Dashboard**")
     st.markdown("---")
     page = st.radio("Navigate", [
@@ -168,7 +169,6 @@ if page == "🏠  Overview":
     st.markdown("Predict who is likely to leave — and understand why.")
     st.markdown("---")
 
-    # KPI row
     total = len(df)
     left  = df['Attrition_Num'].sum()
     rate  = left / total * 100
@@ -360,11 +360,11 @@ elif page == "🤖  Predict Risk":
         with c2:
             overtime = st.selectbox("Works Overtime?", ["No", "Yes"])
             job_satisfaction = st.select_slider("Job Satisfaction", [1, 2, 3, 4],
-                                                 format_func=lambda x: {1:"Low",2:"Medium",3:"High",4:"Very High"}[x])
-            work_life_balance = st.select_slider("Work-Life Balance", [1, 2, 3, 4],
-                                                  format_func=lambda x: {1:"Bad",2:"Good",3:"Better",4:"Best"}[x])
-            environment_sat = st.select_slider("Environment Satisfaction", [1, 2, 3, 4],
                                                 format_func=lambda x: {1:"Low",2:"Medium",3:"High",4:"Very High"}[x])
+            work_life_balance = st.select_slider("Work-Life Balance", [1, 2, 3, 4],
+                                                 format_func=lambda x: {1:"Bad",2:"Good",3:"Better",4:"Best"}[x])
+            environment_sat = st.select_slider("Environment Satisfaction", [1, 2, 3, 4],
+                                               format_func=lambda x: {1:"Low",2:"Medium",3:"High",4:"Very High"}[x])
 
         with c3:
             distance = st.slider("Distance From Home (km)", 1, 30, 5)
@@ -411,14 +411,22 @@ elif page == "🤖  Predict Risk":
         st.markdown("---")
         st.markdown('<div class="section-title">Risk Factors Identified</div>', unsafe_allow_html=True)
         flags = []
-        if overtime == "Yes":         flags.append(("🔴 Overtime", "Working overtime significantly increases attrition risk"))
-        if monthly_income < 3000:     flags.append(("🔴 Low Income", f"Monthly income of ${monthly_income:,} is below the risk threshold"))
-        if years_at_company <= 2:     flags.append(("🟠 Early Tenure", "Employees in their first 2 years are highest-risk"))
-        if job_satisfaction <= 2:     flags.append(("🟠 Low Satisfaction", "Low job satisfaction correlates strongly with attrition"))
-        if work_life_balance <= 2:    flags.append(("🟡 Work-Life Balance", "Poor work-life balance increases attrition probability"))
-        if distance > 20:             flags.append(("🟡 Long Commute", "Large distance from home adds attrition pressure"))
-        if years_since_promo >= 4:    flags.append(("🟡 No Promotion", "4+ years without promotion suggests stagnation"))
-        if business_travel == "Travel_Frequently": flags.append(("🟡 Frequent Travel", "Frequent travel adds stress and attrition risk"))
+        if overtime == "Yes":
+            flags.append(("🔴 Overtime", "Working overtime significantly increases attrition risk"))
+        if monthly_income < 3000:
+            flags.append(("🔴 Low Income", f"Monthly income of ${monthly_income:,} is below the risk threshold"))
+        if years_at_company <= 2:
+            flags.append(("🟠 Early Tenure", "Employees in their first 2 years are highest-risk"))
+        if job_satisfaction <= 2:
+            flags.append(("🟠 Low Satisfaction", "Low job satisfaction correlates strongly with attrition"))
+        if work_life_balance <= 2:
+            flags.append(("🟡 Work-Life Balance", "Poor work-life balance increases attrition probability"))
+        if distance > 20:
+            flags.append(("🟡 Long Commute", "Large distance from home adds attrition pressure"))
+        if years_since_promo >= 4:
+            flags.append(("🟡 No Promotion", "4+ years without promotion suggests stagnation"))
+        if business_travel == "Travel_Frequently":
+            flags.append(("🟡 Frequent Travel", "Frequent travel adds stress and attrition risk"))
 
         if flags:
             for title, desc in flags:
@@ -443,7 +451,8 @@ elif page == "🚨  At-Risk Watch List":
         st.warning("⚠️ Model or cleaned data not found. Run notebooks 01 and 03 first.")
         st.stop()
 
-    X = df_clean.drop('Attrition', axis=1)
+    X = df_clean.copy()
+    X=X[feature_names]
     probs = model.predict_proba(X)[:, 1]
 
     watch = df_raw[['Age', 'Department', 'JobRole', 'MonthlyIncome',
@@ -455,10 +464,10 @@ elif page == "🚨  At-Risk Watch List":
     fc1, fc2, fc3 = st.columns(3)
     with fc1:
         dept_filter = st.multiselect("Department", df_raw['Department'].unique(),
-                                      default=list(df_raw['Department'].unique()))
+                                     default=list(df_raw['Department'].unique()))
     with fc2:
         risk_filter = st.multiselect("Risk Level", ["Critical", "High", "Medium", "Low"],
-                                      default=["Critical", "High"])
+                                     default=["Critical", "High"])
     with fc3:
         threshold = st.slider("Min Probability (%)", 0, 100, 60)
 
@@ -523,7 +532,7 @@ elif page == "🚨  At-Risk Watch List":
 
         st.markdown("---")
         st.markdown('<div class="section-title">Risk Distribution by Department</div>', unsafe_allow_html=True)
-        dept_risk = watch[watch['Risk_Level'].isin(['Critical', 'High'])]\
+        dept_risk = watch[watch['Risk_Level'].isin(['Critical', 'High'])] \
             .groupby('Department')['Risk_Level'].value_counts().unstack(fill_value=0)
         fig, ax = plt.subplots(figsize=(8, 3.5))
         dept_risk.plot(kind='bar', ax=ax,
